@@ -234,3 +234,16 @@ void task3::ExpressionTree::build(char* input)
 		}
 	}
 }
+
+void task3::ExpressionTree::print_var(Node* iter)
+{
+	if (iter == nullptr) return;
+	else
+	{
+		if(is_num_var(iter->val) && !std::isdigit(iter->val))
+			std::cout << iter->val << "\n";
+
+		print(iter->l_child);
+		print(iter->r_child);
+	}
+}

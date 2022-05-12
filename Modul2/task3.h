@@ -38,6 +38,8 @@ namespace task3
 		void del(Node* iter);
 		void add(char val);
 
+		void print_var(Node* iter);
+
 		void build(char* input);
 	};
 	int precedence(char input);
