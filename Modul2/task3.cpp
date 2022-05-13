@@ -1,5 +1,7 @@
 #include "task3.h"
 
+#include <string>
+
 #include <iostream>
 
 template<class T>
@@ -23,7 +25,8 @@ void task3::Stack<T>::printStack()
 template<class T>
 T task3::Stack<T>::top()
 {
-	return this->tail->value;
+	if (this->tail != nullptr) return this->tail->value;
+	else return NULL;
 }
 
 template<class T>
@@ -57,7 +60,7 @@ void task3::Stack<T>::pop()
 
 	else
 	{
-		std::cout << "NO MORE ELEMENTS IN THE STACK";
+		std::cout << "NO MORE ELEMENTS IN THE STACK\n\n";
 		return;
 	}
 }
@@ -65,8 +68,8 @@ void task3::Stack<T>::pop()
 template<class T>
 bool task3::Stack<T>::empty()
 {
-	if (this->head != nullptr) false;
-	else return true;
+	if (this->head == nullptr) return true;
+	else return false;
 }
 
 template<class T>
@@ -102,6 +105,25 @@ void task3::ExpressionTree::print(Node* iter)
 		print(iter->r_child);
 	}
 }
+
+void task3::ExpressionTree::printGraph(const std::string& prefix, const task3::ExpressionTree::Node* node, bool isLeft)
+{
+	if (node != nullptr)
+	{
+		std::cout << prefix;
+
+		std::cout << (isLeft ? "|-- " : "|-- ");
+
+		// print the value of the node
+		std::cout << node->val << std::endl;
+
+		// enter the next tree level - left and right branch
+		task3::ExpressionTree::printGraph(prefix + (isLeft ? "|   " : "    "), node->l_child, true);
+		task3::ExpressionTree::printGraph(prefix + (isLeft ? "|   " : "    "), node->r_child, false);
+	}
+}
+
+
 
 int task3::precedence(char input)
 {
@@ -162,12 +184,15 @@ void task3::infix_to_postfix(char* input, char* result)
 		{
 			if (cur == ' ')
 				continue;
+			bool lol = stack.empty();
+			int kek = task3::precedence(cur);
+			char based = stack.top();
 			while (!stack.empty()
 				&& (task3::precedence(cur) <= task3::precedence(stack.top())))
 			{
 				result[count] = stack.top();
 				count++;
-				stack.pop();				
+				stack.pop();
 			}
 			stack.push(cur);
 		}
@@ -192,31 +217,27 @@ bool task3::is_num_var(char input)
 
 void task3::ExpressionTree::build(char* input)
 {
-	task3::ExpressionTree::Node* x, * y, * z;
 	task3::Stack<task3::ExpressionTree::Node*> stack;
-
 
 	int l = strlen(input);
 	for (int i = 0; i < l; i++)
 	{
-		if (input[i] == '+' || input[i] == '-' || input[i] == '*'
-			|| input[i] == '/' || input[i] == '^'
-			|| input[i] == '%')
+		if (input[i] == '&' || input[i] == '|')
 		{
-			z = new task3::ExpressionTree::Node(input[i]);
-			x = stack.top();
+			task3::ExpressionTree::Node* z = new task3::ExpressionTree::Node(input[i]);
+			task3::ExpressionTree::Node* x = stack.top();
 			stack.pop();
-			y = stack.top();
+			task3::ExpressionTree::Node* y = stack.top();
 			stack.pop();
 			z->l_child = y;
 			z->r_child = x;
 			stack.push(z);
 			this->head = z;
 		}
-		else if (input[i] == '#')
+		else if (input[i] == '-')
 		{
-			z = new task3::ExpressionTree::Node(input[i]);
-			x = stack.top();
+			task3::ExpressionTree::Node* z = new task3::ExpressionTree::Node(input[i]);
+			task3::ExpressionTree::Node* x = stack.top();
 			stack.pop();
 			z->l_child = x;
 			stack.push(z);
@@ -224,10 +245,146 @@ void task3::ExpressionTree::build(char* input)
 		}
 		else
 		{
-			z = new task3::ExpressionTree::Node(input[i]);
+			task3::ExpressionTree::Node* z = new task3::ExpressionTree::Node(input[i]);
 			stack.push(z);
 		}
 	}
+}
+
+int task3::ExpressionTree::simplify(Node* iter)
+{
+	if (iter == nullptr) return -1;
+	else if (iter->val == '0') return 0;
+	else if (iter->val == '1') return 1;
+	else if (is_num_var(iter->val) && !std::isdigit(iter->val)) return 2;
+	else
+	{
+		int left = simplify(iter->l_child);
+		int right = simplify(iter->r_child);
+
+		if (iter->val == '&')
+		{
+			if (left == 0 || right == 0)
+			{
+				del(iter->l_child);
+				del(iter->r_child);
+				iter->l_child = nullptr;
+				iter->r_child = nullptr;
+				iter->val = '0';
+				return 0;
+			}
+
+			else if (left == 1)
+			{
+				del(iter->l_child);
+
+				Node* temp = iter->r_child;
+
+				iter->val = iter->r_child->val;
+				iter->l_child = iter->r_child->l_child;
+				iter->r_child = iter->r_child->r_child;
+
+				delete temp;
+
+				return right;
+			}
+
+			else if (right == 1)
+			{
+				del(iter->r_child);
+
+				Node* temp = iter->l_child;
+
+				iter->val = iter->l_child->val;
+				iter->r_child = iter->l_child->r_child;
+				iter->l_child = iter->l_child->l_child;
+
+				delete temp;
+
+				return left;
+			}
+		}
+
+		if (iter->val == '|')
+		{
+			if (left == 1 || right == 1)
+			{
+				del(iter->l_child);
+				del(iter->r_child);
+				iter->l_child = nullptr;
+				iter->r_child = nullptr;
+				iter->val = '1';
+				return 1;
+			}
+
+			else if (left == 0)
+			{
+				del(iter->l_child);
+
+				Node* temp = iter->r_child;
+
+				iter->val = iter->r_child->val;
+				iter->l_child = iter->r_child->l_child;
+				iter->r_child = iter->r_child->r_child;
+
+				delete temp;
+
+				return right;
+			}
+
+			else if (right == 0)
+			{
+				del(iter->r_child);
+
+				Node* temp = iter->l_child;
+
+				iter->val = iter->l_child->val;
+				iter->r_child = iter->l_child->r_child;
+				iter->l_child = iter->l_child->l_child;
+
+				delete temp;
+
+				return left;
+			}
+		}
+
+		if (iter->val = '-')
+		{
+			if (left == 1)
+			{
+				iter->val = '0';
+				del(iter->l_child);
+				iter->l_child = nullptr;
+				return 0;
+			}
+			else if (left == 0)
+			{
+				iter->val = '1';
+				del(iter->l_child);
+				iter->l_child = nullptr;
+				return 1;
+			}
+			else if (iter->l_child->val == '-')
+			{
+				Node* temp = iter->l_child;
+
+				iter->r_child = iter->l_child->l_child->r_child;
+				iter->l_child = iter->l_child->l_child->l_child;
+				iter->val = temp->l_child->val;
+
+				delete(temp->l_child);
+				delete(temp);
+
+				int res = simplify(iter);
+
+				return res;
+
+			}
+		}
+
+		return 100;
+	}
+
 }
 
 void task3::ExpressionTree::print_var(Node* iter)
@@ -235,10 +392,11 @@ void task3::ExpressionTree::print_var(Node* iter)
 	if (iter == nullptr) return;
 	else
 	{
-		if(is_num_var(iter->val) && !std::isdigit(iter->val))
+		if (is_num_var(iter->val) && !std::isdigit(iter->val))
 			std::cout << iter->val << "\n";
 
 		print(iter->l_child);
 		print(iter->r_child);
 	}
 }
+

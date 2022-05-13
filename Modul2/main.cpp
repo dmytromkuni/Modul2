@@ -127,3 +127,39 @@ int main()
 	// .
 
 }
+
+/*#include <fstream>
+#include <iostream>
+#include <string>
+
+#include "task3.h"
+
+int main()
+{
+	// TASK 3
+	//
+	// .
+
+	task3::ExpressionTree tree;
+
+	const int SIZE = 50;
+	char inp[SIZE] = "-(x&1)|((y&0)|-(x&1))";
+	char out[SIZE] = "";
+
+	task3::infix_to_postfix(inp, out);
+
+	tree.build(out);
+	tree.printGraph("", tree.head, false);
+	std::cout << "\n\n";
+	int res = tree.simplify(tree.head);
+	tree.print(tree.head);
+	std::cout << "\n\n";
+
+
+	// TASK 3
+	//
+	//
+	// .
+
+}
+*/

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace task3
 {
 	template <class T>
@@ -33,14 +35,19 @@ namespace task3
 
 		Node* head = nullptr;
 
+		void change_val(Node* iter);
+
 		void print(Node* iter);
-		void simplify(Node* iter);
+		void printGraph(const std::string& prefix, const task3::ExpressionTree::Node* node, bool isLeft);
+
 		void del(Node* iter);
 		void add(char val);
 
 		void print_var(Node* iter);
 
 		void build(char* input);
+
+		int simplify(Node* iter);
 	};
 	int precedence(char input);
 	void infix_to_postfix(char* input, char* result);
