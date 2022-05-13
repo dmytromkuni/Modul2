@@ -93,7 +93,7 @@ bool task4_cycle_check(int** mtrx, int size)
 	}
 	return false;
 }
-/*
+
 int main()
 {
 	// TASK 4
@@ -127,4 +127,3 @@ int main()
 	// .
 
 }
-*/

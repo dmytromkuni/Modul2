@@ -1,11 +1,11 @@
-#include <fstream>
-#include <iostream>
+/*#include <fstream>
+#include <iostream>*/
 
 // TASK 1
 //
 // .
 
-int** task4_read(char* NAME)
+/*int** task4_read(char* NAME)
 {
 	std::ifstream file(NAME, std::ifstream::in);
 
@@ -133,3 +133,4 @@ int main()
 	// .
 
 }
+*/

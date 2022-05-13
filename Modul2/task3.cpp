@@ -58,7 +58,7 @@ void task3::Stack<T>::pop()
 	else
 	{
 		std::cout << "NO MORE ELEMENTS IN THE STACK";
-		return 0;
+		return;
 	}
 }
 
@@ -86,6 +86,12 @@ void task3::Stack<T>::push(T value)
 	}
 }
 
+task3::ExpressionTree::Node::Node(char val)
+{
+	this->val = val;
+}
+
+
 void task3::ExpressionTree::print(Node* iter)
 {
 	if (iter == nullptr) return;
@@ -107,17 +113,6 @@ int task3::precedence(char input)
 		return 2;
 	else
 		return -1;
-}
-
-void task3::ExpressionTree::print(Node* iter)
-{
-	if (iter == nullptr) return;
-	else
-	{
-		std::cout << iter->val << " ";
-		print(iter->l_child);
-		print(iter->r_child);
-	}
 }
 
 void task3::ExpressionTree::del(Node* iter)
@@ -198,7 +193,7 @@ bool task3::is_num_var(char input)
 void task3::ExpressionTree::build(char* input)
 {
 	task3::ExpressionTree::Node* x, * y, * z;
-	task3::Stack<ExpressionTree::Node*> stack;
+	task3::Stack<task3::ExpressionTree::Node*> stack;
 
 
 	int l = strlen(input);
